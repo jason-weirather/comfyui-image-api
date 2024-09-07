@@ -22,6 +22,7 @@ class ComfyRunner:
 
         # Disable that weird tracking thing
         result = subprocess.run(["comfy", "tracking","disable"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
         # Print the output
         print("Output:")
         print(result.stdout)
@@ -42,11 +43,13 @@ class ComfyRunner:
         cmd = ["comfy","--workspace",comfyui_path,"launch","--background","--",
                "--port","8188",
                "--extra-model-paths-config",self.extra_model_paths,
-               "--output-directory","/home/x/Projects/2024_08_ComfyUI/output-comfyui"
+               "--output-directory",output_directory
               ]
 
         # Run the command and capture the output
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if result.stderr:
+            raise Exception(f"Error generating image: {result.stderr}")
 
         # Print the output
         print("Output:")
