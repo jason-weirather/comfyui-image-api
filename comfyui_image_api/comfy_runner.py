@@ -2,6 +2,7 @@ import subprocess
 import os
 import json
 import random
+import tempfile
 
 import importlib.resources as pkg_resources
 
@@ -21,7 +22,7 @@ class ComfyRunner:
 
 
         # Disable that weird tracking thing
-        result = subprocess.run(["comfy", "tracking","disable"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(["comfy","--skip-prompt","--no-enable-telemetry", "tracking","disable"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         # Print the output
         print("Output:")
@@ -31,7 +32,7 @@ class ComfyRunner:
             print("Error:")
             print(result.stderr)
         # Stop any currently running server
-        result = subprocess.run(["comfy", "stop"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(["comfy","--skip-prompt","--no-enable-telemetry", "stop"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         # Print the output
         print("Output:")
         print(result.stdout)
@@ -40,11 +41,13 @@ class ComfyRunner:
             print("Error:")
             print(result.stderr)
         # Start a freshly running server
-        cmd = ["comfy","--workspace",comfyui_path,"launch","--background","--",
+        cmd = ["comfy","--skip-prompt","--no-enable-telemetry","--workspace",comfyui_path,"launch","--background","--",
                "--port","8188",
+               "--listen","0.0.0.0",
                "--extra-model-paths-config",self.extra_model_paths,
                "--output-directory",output_directory
               ]
+        print(f"Starting launch workspace: {' '.join(cmd)}")
 
         # Run the command and capture the output
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -72,13 +75,26 @@ class ComfyRunner:
         workflow['31']['inputs']['seed'] = seed
         workflow['6']['inputs']['text'] = prompt
 
-        temp_workflow_path = "Processing/_temp_api.json"
-        with open(temp_workflow_path, 'wt') as f:
-            f.write(json.dumps(workflow, indent=2))
+        #temp_workflow_path = "Processing/_temp_api.json"
+        #with open(temp_workflow_path, 'wt') as f:
+        #    f.write(json.dumps(workflow, indent=2))
 
-        # Run ComfyUI with the workflow
-        cmd = f"comfy run --workflow {temp_workflow_path} --wait".split()
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Create a temporary file for the workflow
+        with tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=True) as temp_workflow_file:
+            # Write the updated workflow to the temp file
+            temp_workflow_file.write(json.dumps(workflow, indent=2))
+            temp_workflow_file.flush()  # Ensure data is written to disk
+
+            # Run ComfyUI with the temporary workflow file
+            cmd = f"comfy run --workflow {temp_workflow_file.name} --wait".split()
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+
+
+
+        ## Run ComfyUI with the workflow
+        #cmd = f"comfy run --workflow {temp_workflow_path} --wait".split()
+        #result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         if result.stderr:
             raise Exception(f"Error generating image: {result.stderr}")

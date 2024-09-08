@@ -23,7 +23,7 @@ dependencies = [
 "Homepage" = "https://github.com/jason-weirather/comfyui-image-api"
 
 [project.scripts]
-comfyui-api = "comfyui_image_api.api_server:main"
+comfy-api = "comfyui_image_api.api_server:main"
 
 [tool.setuptools]
 package-data = { "comfyui_image_api" = ["Templates/*.yaml","Templates/Workflow_api_json/*.json"] }
