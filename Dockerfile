@@ -64,4 +64,4 @@ RUN mkdir -p /home/mambauser/.config/comfy-cli && \
 EXPOSE 8888
 EXPOSE 8188
 # Command to start comfy-api
-CMD ["comfy-api", "--port=8888"]
+CMD ["comfy-api", "--port","8888","--model-path","/opt/ComfyUI/models/diffusers"]

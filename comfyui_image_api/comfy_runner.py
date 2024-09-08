@@ -3,23 +3,36 @@ import os
 import json
 import random
 import tempfile
+import yaml
+import atexit
 
 import importlib.resources as pkg_resources
 
 class ComfyRunner:
-    def __init__(self, comfyui_path, output_directory):
+    def __init__(self, comfyui_path, model_path, output_directory):
         self.comfyui_path = comfyui_path
         self.output_directory = output_directory
 
         # Use a context manager to get the path to the extra_model_paths.yaml file
         with pkg_resources.path("comfyui_image_api.Templates", "extra_model_paths.yaml") as yaml_file_path:
+            template_extra_models = yaml.safe_load(open(yaml_file_path).read())
+            print(template_extra_models)
+            template_extra_models['fluxdev']['base_path'], self.checkpoint_name = os.path.split(model_path)
+            template_extra_models['fluxdev']['checkpoints'] = './'
+
+            with tempfile.NamedTemporaryFile(mode='w+', suffix='.yaml', delete=False) as temp_yaml:
+                temp_yaml_path = temp_yaml.name
+                atexit.register(os.remove, temp_yaml_path)
+                temp_yaml.write(yaml.dump(template_extra_models,indent=2))
+                print(yaml.dump(template_extra_models,indent=2))
+            print(f"Temporary yaml created at: {temp_yaml_path}")
+
+
             self.extra_model_paths = str(yaml_file_path)
         with pkg_resources.path("comfyui_image_api.Templates.Workflow_api_json", "flex-dev-simple.json") as json_file_path:
             self.model_config_path = str(json_file_path)
         print("Extra model paths:")
         print(self.extra_model_paths)
-
-
 
         # Disable that weird tracking thing
         result = subprocess.run(["comfy","--skip-prompt","--no-enable-telemetry", "tracking","disable"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -44,7 +57,7 @@ class ComfyRunner:
         cmd = ["comfy","--skip-prompt","--no-enable-telemetry","--workspace",comfyui_path,"launch","--background","--",
                "--port","8188",
                "--listen","0.0.0.0",
-               "--extra-model-paths-config",self.extra_model_paths,
+               "--extra-model-paths-config",temp_yaml_path,
                "--output-directory",output_directory
               ]
         print(f"Starting launch workspace: {' '.join(cmd)}")
@@ -72,6 +85,7 @@ class ComfyRunner:
         with open(self.model_config_path, 'rt') as f:
             workflow = json.load(f)
 
+        workflow['30']['inputs']['ckpt_name'] = self.checkpoint_name
         workflow['31']['inputs']['seed'] = seed
         workflow['6']['inputs']['text'] = prompt
 

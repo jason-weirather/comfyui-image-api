@@ -1,3 +1,3 @@
 fluxdev:
-    base_path: /home/x
-    checkpoints: Models/diffusers/
+    base_path: /
+    checkpoints: /
