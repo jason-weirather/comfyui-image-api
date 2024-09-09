@@ -27,15 +27,15 @@ The **ComfyUI Image API** provides a REST API to generate images using Stable Di
 
 ## Requirements
 
-Before running the ComfyUI Image API, ensure the following dependencies are installed on your system:
+1. Before running the ComfyUI Image API, ensure the following dependencies are installed on your system:
+  - **Python 3.8+**
+  - **PyTorch** with CUDA support (if you are using GPU-based image generation)
+  - **ComfyUI**
+  - **comfy-cli**
+  - **Docker** (optional but recommended for containerized deployments)
 
-- **Python 3.8+**
-- **PyTorch** with CUDA support (if you are using GPU-based image generation)
-- **ComfyUI**
-- **comfy-cli**
-- **Docker** (optional but recommended for containerized deployments)
+2. Download the `fp8` **FLUX.1[dev]** model from [Comfy-Org on huggingface](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors)
 
-Download the `fp8` **FLUX.1[dev]** model from [Comfy-Org on huggingface](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors)
 ---
 
 ## Installation
