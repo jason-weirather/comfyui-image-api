@@ -34,7 +34,7 @@ The **ComfyUI Image API** provides a REST API to generate images using Black For
   - **comfy-cli**
   - **Docker** (optional but recommended for containerized deployments)
 
-2. Download the `fp8` **FLUX.1 [dev]** model file [`flux1-dev-fp8.safetensors`](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) from Comfy-Org on huggingface.
+2. Download the `fp8` **`FLUX.1 [dev]`** model file [`flux1-dev-fp8.safetensors`](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) from Comfy-Org on huggingface.
 
 ---
 
@@ -217,7 +217,7 @@ else:
 
 This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
 
-Note, **FLUX.1 [dev]** has its own [license](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/LICENSE.md).
+Note, **`FLUX.1 [dev]`** has its own [LICENSE](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/LICENSE.md).
 
 ---
 
