@@ -60,8 +60,10 @@ RUN cd /opt/comfyui-image-api && micromamba run -n base pip install -e .
 RUN mkdir -p /home/mambauser/.config/comfy-cli && \
     chmod -R 777 /home/mambauser
 
+ENV COMFYUI_IMAGE_API_DEFAULT_HOST 0.0.0.0
+
 # Set up entrypoint for comfy-api, model-path is required
 ENTRYPOINT ["micromamba","run","-n","base","comfy-api"]
 
 # Command to start comfy-api
-CMD ["comfy-api", "--port","8888","--model-path","/opt/ComfyUI/models/diffusers"]
+CMD ["comfy-api", "--port","8888","--host","$COMFYUI_IMAGE_API_HOST","--model-path","/opt/ComfyUI/models/diffusers"]

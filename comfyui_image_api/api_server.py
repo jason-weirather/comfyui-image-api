@@ -12,6 +12,9 @@ import json
 from jsonschema import validate, ValidationError
 import importlib.resources as pkg_resources
 from threading import Lock, Thread
+import subprocess
+
+from comfyui_image_api import __version__
 
 app = Flask(__name__)
 
@@ -19,14 +22,32 @@ app = Flask(__name__)
 job_queue = []
 queue_lock = Lock()
 
+
+class PublicServerConfig:
+    def __init__(self, max_queue, workflow_name, comfyui_path):
+        self.max_queue = max_queue
+        self.workflow_name = workflow_name
+        self.comfyui_path = comfyui_path
+        self.__version__ = __version__
+
+    def get_status_info(self):
+        """Returns a dictionary with the server's public status details."""
+        return {
+            "api_version": self.__version__,
+            "max_queue_size": self.max_queue,
+            "current_workflow": self.workflow_name
+        }
+
 @click.command()
 @click.option("--model-path", help="The path to your locally available model.", required=True)
-@click.option("--host", default="0.0.0.0", help="The host to bind the server to.", show_default=True)
-@click.option("--port", default=8888, help="The port to bind the server to.", show_default=True)
-@click.option("--comfyui-path", default=os.environ.get("COMFYUI_PATH"), help="The path to the ComfyUI installation.", show_default=True)
+@click.option("--host", default=os.environ.get("COMFYUI_IMAGE_API_DEFAULT_HOST","127.0.0.1"), help="The host to bind the api server to, the default can be overriden by the environment variable COMFYUI_IMAGE_API_DEFAULT_HOST", show_default=True)
+@click.option("--port", default=8888, help="The port to bind the api server to.", show_default=True)
+@click.option("--comfyui-path", default=os.environ.get("COMFYUI_PATH"), help="The path to the ComfyUI installation, the default can be overriden by COMFYUI_PATH", show_default=True)
+@click.option("--comfyui-host", default="127.0.0.1", help="The host to bind the ComfyUI server to.", show_default=True)
+@click.option("--comfyui-port", default=8188, help="The port to bind the ComfyUI server to.", show_default=True)
 @click.option("--output-path", help="The path to write images, if not set, a temporary directory will be created.")
 @click.option("--max-queue", default=5, help="Maximum number of image generation requests allowed in the queue.", show_default=True)
-def main(model_path, host, port, comfyui_path, output_path, max_queue):
+def main(model_path, host, port, comfyui_path, comfyui_host, comfyui_port, output_path, max_queue):
 
     if comfyui_path is None:
         raise click.UsageError("You must provide the --comfyui-path option or set the COMFYUI_PATH environment variable.")
@@ -37,11 +58,19 @@ def main(model_path, host, port, comfyui_path, output_path, max_queue):
         output_path = temp_dir
         atexit.register(shutil.rmtree, temp_dir)
 
+    config = PublicServerConfig(
+        max_queue = max_queue,
+        workflow_name = "Comfy-Org Flux.1-Dev fp8",
+        comfyui_path = comfyui_path
+    )
+    app.config['public_config'] = config
+
     app.config['output_path'] = output_path
-    app.config['max_queue'] = max_queue
 
     app.config['comfy_runner'] = ComfyRunner(
         comfyui_path=comfyui_path,
+        comfyui_host=comfyui_host,
+        comfyui_port=comfyui_port,
         model_path=model_path,
         output_directory=output_path
     )
@@ -49,6 +78,15 @@ def main(model_path, host, port, comfyui_path, output_path, max_queue):
 
     """Run the ComfyUI Image API server."""
     app.run(host=host, port=port)
+
+@app.route("/status", methods=["GET"])
+def status():
+    config = app.config['public_config']
+
+    return jsonify({
+        "public_configuration": config.get_status_info(),
+        "job_queue": len(job_queue)
+    }), 200
 
 # Pull the generate json schema to validate against
 with pkg_resources.path("comfyui_image_api.Schema", "generate_schema.json") as json_path:
@@ -88,9 +126,9 @@ def generate():
     # Lock queue operations
     with queue_lock:
         # Check if the queue is full
-        if len(job_queue) >= app.config['max_queue']:
+        if len(job_queue) >= app.config['public_config'].max_queue:
             return jsonify({"status": "error", "message": "Job queue is full. Please try again later."}), 429
-        
+
         # Add job to the queue
         job_queue.append(processed_data)
 

@@ -10,7 +10,7 @@ import sys
 import importlib.resources as pkg_resources
 
 class ComfyRunner:
-    def __init__(self, comfyui_path, model_path, output_directory):
+    def __init__(self, comfyui_path, comfyui_host, comfyui_port, model_path, output_directory):
         self.comfyui_path = comfyui_path
         self.output_directory = output_directory
 
@@ -56,8 +56,8 @@ class ComfyRunner:
             print(result.stderr)
         # Start a freshly running server
         cmd = ["comfy","--skip-prompt","--no-enable-telemetry","--workspace",comfyui_path,"launch","--background","--",
-               "--port","8188",
-               "--listen","0.0.0.0",
+               "--port",f"{comfyui_port}",
+               "--listen",f"{comfyui_host}",
                "--extra-model-paths-config",temp_yaml_path,
                "--output-directory",output_directory
               ]
