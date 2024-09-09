@@ -2,7 +2,7 @@
 
 ### For Black Forest Lab's `FLUX.1 [dev]` Model
 
-The **ComfyUI Image API** enables GPU users to leverage ComfyUI’s advanced workflow management capabilities for running Black Forest Lab's **`FLUX.1 [dev]`** model. Designed for GPUs with limited memory, this project can run the `fp8` version of **`FLUX.1 [dev]**` in under 20GB of VRAM. The API provides a containerized, RESTful interface for image generation, offering both scalability and ease of use.
+The **ComfyUI Image API** enables GPU users to leverage ComfyUI’s advanced workflow management capabilities for running Black Forest Lab's **`FLUX.1 [dev]`** model. Designed for GPUs with limited memory, this project can run the `fp8` version of **`FLUX.1 [dev]`** in under 20GB of VRAM. The API provides a containerized, RESTful interface for image generation, offering both scalability and ease of use.
 
 This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to allow seamless submission of image generation jobs. It offers a queue system for handling multiple requests while ensuring efficient resource utilization.
 
