@@ -14,9 +14,36 @@ This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to allow seamless 
 - **Status endpoint** to monitor server details such as the API version, current queue size, and workflow information.
 - **Dockerized** for easy setup and deployment.
 
-![Example Output](https://i.imgur.com/Icvj2cr.png)
+## Quickstart
 
-`instagram photo of fried drumsticks (chicken), korean style, a huge portion on the dinner table, a cute hungry farm piglet is looking at the plate`
+1. Have a Cuda capable GPU and Docker installed
+2. Get the the docker image `docker pull vacation/comfyui-image-api:0.1.0`
+3. [Download the model.](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) Comfy-Org's `fp8` version of Black Forest Lab's `FLUX.1 [dev]` from huggingface
+4. Run the server with Docker (This example, for linux/unix users runs it as the current user, windows users may need to omit the `--user` option)
+
+```bash
+docker run --rm --user $(id -u):$(id -g) \
+  -v /path/to/models:/path/to/models  \
+  -p 8888:8888 \
+  --gpus all \
+  vacation/comfyui-image-api:0.1.0 \
+    --model-path /path/to/models/flux1-dev-fp8.safetensors
+```
+
+5. Use your server exposed on port 8888 to make an image
+
+```bash
+curl -X POST http://127.0.0.1:8888/generate \
+-H "Content-Type: application/json" \
+-d '{
+  "prompt": "instagram photo of fried drumsticks (chicken), korean style, a huge portion on the dinner table, a cute hungry farm piglet is looking at the plate",
+  "steps": 50,
+  "width": 1024,
+  "height": 1024
+}' | grep -o '"image":"[^"]*' | sed 's/"image":"//' | base64 --decode > generated_image.png
+```
+
+![Example Output](https://i.imgur.com/Icvj2cr.png)
 
 ---
 
