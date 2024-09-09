@@ -1,6 +1,6 @@
 # ComfyUI Image API
 
-The **ComfyUI Image API** provides a REST API to generate images using Stable Diffusion models with ComfyUI workflows. It allows you to submit jobs to a queue for image generation based on prompts and various settings. This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to provide an easy-to-use endpoint for generating AI-generated images.
+The **ComfyUI Image API** provides a REST API to generate images using Black Forest Lab's **`FLUX.1 [dev]`** model with a ComfyUI workflow. It allows you to submit jobs to a queue for image generation based on prompts and various settings. This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to provide an easy-to-use endpoint for generating AI-generated images.
 
 ## Features
 
@@ -34,7 +34,7 @@ The **ComfyUI Image API** provides a REST API to generate images using Stable Di
   - **comfy-cli**
   - **Docker** (optional but recommended for containerized deployments)
 
-2. Download the `fp8` **FLUX.1[dev]** model from [Comfy-Org on huggingface](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors)
+2. Download the `fp8` **FLUX.1 [dev]** model file [`flux1-dev-fp8.safetensors`](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) from Comfy-Org on huggingface.
 
 ---
 
@@ -90,7 +90,7 @@ You can also run the server via Docker:
 docker run -p 8888:8888 -v /path/to/models:/path/to/models comfyui-image-api --model-path /path/to/models
 ```
 
-Where `/path/to/models` contains the [`flux1-dev-fp8.safetensors` model from Comfy-Org](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors).
+Where `/path/to/models` contains the [`flux1-dev-fp8.safetensors`](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) model from Comfy-Org on huggingface.
 
 ---
 
@@ -217,7 +217,7 @@ else:
 
 This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
 
-Note, the model used by this API, **FLUX.1 [dev]**, has its own license [license](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/LICENSE.md).
+Note, **FLUX.1 [dev]** has its own [license](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/LICENSE.md).
 
 ---
 
