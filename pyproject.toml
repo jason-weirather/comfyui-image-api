@@ -16,7 +16,8 @@ dependencies = [
     "Flask",
     "PyYAML",
     "numpy",
-    "click"
+    "click",
+    "jsonschema"
 ]
 
 [project.urls]

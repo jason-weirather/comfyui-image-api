@@ -5,6 +5,7 @@ import random
 import tempfile
 import yaml
 import atexit
+import sys
 
 import importlib.resources as pkg_resources
 
@@ -101,8 +102,13 @@ class ComfyRunner:
 
             # Run ComfyUI with the temporary workflow file
             cmd = f"comfy run --workflow {temp_workflow_file.name} --wait".split()
+
+            # Capture output only on error
             result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-        if result.stderr:
-            raise Exception(f"Error generating image: {result.stderr}")
-        return result.stdout
+            # If there's an error, raise an exception and show the error output
+            if result.returncode != 0:
+                raise Exception(f"Error generating image: {result.stderr}")
+
+        return "Image generation completed."
+
