@@ -1,5 +1,9 @@
 # ComfyUI Image API
 
+## For Black Forest Lab's `FLUX.1 [dev]` model
+
+The motivation for this project is that ComfyUI provides excellent workflow management on GPUs with limited memory resources, and is capable of running the `fp8` version of `FLUX.1 [dev]` in less than 20GB of GPU memory, this package lets users with GPU cards leverage ComfyUI's software through an API server, and one that can be containerized. 
+
 The **ComfyUI Image API** provides a REST API to generate images using Black Forest Lab's **`FLUX.1 [dev]`** model with a ComfyUI workflow. It allows you to submit jobs to a queue for image generation based on prompts and various settings. This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to provide an easy-to-use endpoint for generating AI-generated images.
 
 ## Features
@@ -31,7 +35,7 @@ The **ComfyUI Image API** provides a REST API to generate images using Black For
   - **Python 3.8+**
   - **PyTorch** with CUDA support (if you are using GPU-based image generation)
   - **ComfyUI**
-  - **comfy-cli**
+  - **comfy-cli** (Within an offline/docker environment, the external network calls need to be disable as in [this fork](https://github.com/jason-weirather/comfy-cli/tree/fixhangbug/comfy_cli))
   - **Docker** (optional but recommended for containerized deployments)
 
 2. Download the `fp8` **`FLUX.1 [dev]`** model file [`flux1-dev-fp8.safetensors`](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) from Comfy-Org on huggingface.
