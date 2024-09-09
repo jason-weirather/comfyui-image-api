@@ -35,6 +35,7 @@ Before running the ComfyUI Image API, ensure the following dependencies are inst
 - **comfy-cli**
 - **Docker** (optional but recommended for containerized deployments)
 
+Download the `fp8` **FLUX.1[dev]** model from [Comfy-Org on huggingface](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors)
 ---
 
 ## Installation
