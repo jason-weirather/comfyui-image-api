@@ -235,5 +235,3 @@ Note, **`FLUX.1 [dev]`** has its own [LICENSE](https://huggingface.co/black-fore
 - **Jason Weirather** - [@jason-weirather](https://github.com/jason-weirather)
 
 ---
-
-This draft provides a comprehensive overview of your API's functionality and usage. Feel free to edit it further based on any additional features or specifics that you would like to include!
