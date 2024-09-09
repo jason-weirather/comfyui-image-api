@@ -91,7 +91,12 @@ comfy-api --model-path /path/to/your/model
 You can also run the server via Docker:
 
 ```bash
-docker run -p 8888:8888 -v /path/to/models:/path/to/models comfyui-image-api --model-path /path/to/models
+docker run --rm --user $(id -u):$(id -g) \
+  -v /path/to/models:/path/to/models  \
+  -p 8888:8888 \
+  --gpus all \
+  vacation/comfyui-image-api:0.1.0 \
+    --model-path /path/to/models/flux1-dev-fp8.safetensors
 ```
 
 Where `/path/to/models` contains the [`flux1-dev-fp8.safetensors`](https://huggingface.co/Comfy-Org/flux1-dev/blob/main/flux1-dev-fp8.safetensors) model from Comfy-Org on huggingface.
