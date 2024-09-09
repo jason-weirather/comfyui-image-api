@@ -1,18 +1,20 @@
 # ComfyUI Image API
 
-## For Black Forest Lab's `FLUX.1 [dev]` model
+### For Black Forest Lab's `FLUX.1 [dev]` Model
 
-The motivation for this project is that ComfyUI provides excellent workflow management on GPUs with limited memory resources, and is capable of running the `fp8` version of `FLUX.1 [dev]` in less than 20GB of GPU memory, this package lets users with GPU cards leverage ComfyUI's software through an API server, and one that can be containerized. 
+The **ComfyUI Image API** enables GPU users to leverage ComfyUI’s advanced workflow management capabilities for running Black Forest Lab's **`FLUX.1 [dev]`** model. Designed for GPUs with limited memory, this project can run the `fp8` version of **`FLUX.1 [dev]**` in under 20GB of VRAM. The API provides a containerized, RESTful interface for image generation, offering both scalability and ease of use.
 
-The **ComfyUI Image API** provides a REST API to generate images using Black Forest Lab's **`FLUX.1 [dev]`** model with a ComfyUI workflow. It allows you to submit jobs to a queue for image generation based on prompts and various settings. This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to provide an easy-to-use endpoint for generating AI-generated images.
+This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to allow seamless submission of image generation jobs. It offers a queue system for handling multiple requests while ensuring efficient resource utilization.
 
 ## Features
 
-- Expose an HTTP API to generate images using the **Comfy-Org Flux.1-Dev fp8** model.
-- Establish a job queue to handle multiple image generation requests sequentially.
-- Limit the maximum size of the job queue to large backlogs of jobs.
-- Option to query the server for status, including the current number of jobs in the queue, API version, and more.
-- Packaged in a Docker container for convenient deployment
+- **HTTP API** to generate images using the **Comfy-Org Flux.1-Dev fp8** model.
+- **Job queue** for sequential processing of multiple image generation requests.
+- **Configurable queue limits** to control the maximum number of jobs.
+- **Status endpoint** to monitor server details such as the API version, current queue size, and workflow information.
+- **Dockerized** for easy setup and deployment.
+
+![Example Output](https://i.imgur.com/Icvj2cr.png)
 
 ---
 
