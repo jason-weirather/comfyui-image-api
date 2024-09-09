@@ -7,6 +7,12 @@ import time
 import base64
 import shutil
 import atexit
+import random
+
+import json
+from jsonschema import validate, ValidationError
+
+import importlib.resources as pkg_resources
 
 app = Flask(__name__)
 
@@ -15,7 +21,7 @@ app = Flask(__name__)
 @click.option("--host", default="0.0.0.0", help="The host to bind the server to.", show_default=True)
 @click.option("--port", default=8888, help="The port to bind the server to.", show_default=True)
 @click.option("--comfyui-path", default=os.environ.get("COMFYUI_PATH"), help="The path to the ComfyUI installation.", show_default=True)
-@click.option("--output-path", help="The path to write images.")
+@click.option("--output-path", help="The path to write images, if not set, a temporary directory will be created.")
 def main(model_path, host, port, comfyui_path, output_path):
 
     if comfyui_path is None:
@@ -39,12 +45,38 @@ def main(model_path, host, port, comfyui_path, output_path):
     """Run the ComfyUI Image API server."""
     app.run(host=host, port=port)
 
+# Pull the generate json schema to validate against
+with pkg_resources.path("comfyui_image_api.Schema", "generate_schema.json") as json_path:
+    generate_schema = json.loads(open(json_path).read())
+
 
 @app.route("/generate", methods=["POST"])
 def generate():
     data = request.json
-    prompt = data.get("prompt", "")
-    seed = data.get("seed")
+    try:
+        # Validate the incoming data against the schema
+        validate(instance=data, schema=generate_schema)
+    except ValidationError as e:
+        return jsonify({"status": "error", "message": e.message}), 400
+
+    # Seed requires more complicated processing
+    if data.get("seed") is None:
+        seed = random.randint(
+            generate_schema["properties"]["seed"]["minimum"],
+            generate_schema["properties"]["seed"]["maximum"]
+        )
+    else:
+        seed = data.get("seed")
+
+    processed_data = {
+        "prompt":data.get("prompt", ""),
+        "seed":seed,
+        "width":data.get("width",generate_schema["properties"]["width"]["default"]),
+        "height":data.get("height",generate_schema["properties"]["height"]["default"]),
+        "steps":data.get("steps",generate_schema["properties"]["steps"]["default"]),
+        "cfg":data.get("cfg",generate_schema["properties"]["cfg"]["default"]),
+        "denoise":data.get("denoise",generate_schema["properties"]["denoise"]["default"])
+    }
 
     comfy_runner = app.config['comfy_runner']
     output_path = app.config['output_path']
@@ -52,7 +84,7 @@ def generate():
 
     try:
         # Generate the image
-        comfy_runner.generate_image(prompt, seed)
+        comfy_runner.generate_image(processed_data)
 
         # Poll the output directory for the new image
         image_path = None

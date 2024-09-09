@@ -26,7 +26,6 @@ RUN mkdir -p /opt/comfy-cli && \
 # Switch back to the default user for micromamba
 USER mambauser
 
-
 # Clone ComfyUI repo and install dependencies
 RUN micromamba run -n base git clone https://github.com/comfyanonymous/ComfyUI.git /opt/ComfyUI && \
     micromamba run -n base pip install -r /opt/ComfyUI/requirements.txt
@@ -43,11 +42,6 @@ RUN micromamba run -n base comfy \
         --workspace $COMFYUI_PATH \
         --skip-prompt \
         --no-enable-telemetry tracking disable
-# && \
-#    echo "Tracking disabled, running comfy env..." && \
-#    micromamba run -n base comfy \
-#        --workspace $COMFYUI_PATH \
-#        --skip-prompt --no-enable-telemetry env
 
 USER root
 # Copy the entire repository into the container
@@ -55,13 +49,19 @@ ADD . /opt/comfyui-image-api
 # Set permissions for the copied files
 RUN chmod -R 777 /opt/comfyui-image-api
 
+RUN mkdir -p /.cache/mamba/proc && \
+    chmod -R 777 /.cache/mamba && \
+    mkdir -p /.config && \
+    chmod -R 777 /.config
+
 USER mambauser
 RUN cd /opt/comfyui-image-api && micromamba run -n base pip install -e .
 
 RUN mkdir -p /home/mambauser/.config/comfy-cli && \
     chmod -R 777 /home/mambauser
 
-EXPOSE 8888
-EXPOSE 8188
+# Set up entrypoint for comfy-api, model-path is required
+ENTRYPOINT ["micromamba","run","-n","base","comfy-api"]
+
 # Command to start comfy-api
 CMD ["comfy-api", "--port","8888","--model-path","/opt/ComfyUI/models/diffusers"]

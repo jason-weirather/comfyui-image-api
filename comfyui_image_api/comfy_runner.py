@@ -77,21 +77,21 @@ class ComfyRunner:
             print(result.stderr)
 
 
-    def generate_image(self, prompt, seed=None):
-        if seed is None:
-            seed = random.randint(0, 289135626765403)
-
+    def generate_image(self, data):
+        print(data)
         # Load the workflow template
         with open(self.model_config_path, 'rt') as f:
             workflow = json.load(f)
 
         workflow['30']['inputs']['ckpt_name'] = self.checkpoint_name
-        workflow['31']['inputs']['seed'] = seed
-        workflow['6']['inputs']['text'] = prompt
-
-        #temp_workflow_path = "Processing/_temp_api.json"
-        #with open(temp_workflow_path, 'wt') as f:
-        #    f.write(json.dumps(workflow, indent=2))
+        workflow['31']['inputs']['seed'] = data['seed']
+        workflow['31']['inputs']['steps'] = data['steps']
+        workflow['31']['inputs']['denoise'] = data['denoise']
+        workflow['35']['inputs']['guidance'] = data['cfg']
+        workflow['6']['inputs']['text'] = data['prompt']
+        # Set image size
+        workflow['27']['inputs']['width'] = data['width']
+        workflow['27']['inputs']['height'] = data['height']
 
         # Create a temporary file for the workflow
         with tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=True) as temp_workflow_file:
@@ -102,13 +102,6 @@ class ComfyRunner:
             # Run ComfyUI with the temporary workflow file
             cmd = f"comfy run --workflow {temp_workflow_file.name} --wait".split()
             result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-
-
-
-        ## Run ComfyUI with the workflow
-        #cmd = f"comfy run --workflow {temp_workflow_path} --wait".split()
-        #result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         if result.stderr:
             raise Exception(f"Error generating image: {result.stderr}")
