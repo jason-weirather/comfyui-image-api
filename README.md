@@ -16,6 +16,8 @@ This API integrates **ComfyUI**, **comfy-cli**, and **Flask** to allow seamless 
 
 ![Example Output](https://i.imgur.com/Icvj2cr.png)
 
+`instagram photo of fried drumsticks (chicken), korean style, a huge portion on the dinner table, a cute hungry farm piglet is looking at the plate`
+
 ---
 
 ## Table of Contents
@@ -185,7 +187,7 @@ Additionally, the server configuration (such as `max_queue_size`) is exposed via
 
 ## Examples
 
-### Python Client Example
+### Python Jupyter Notebook Client Example
 
 You can use Python's `requests` library to interact with the API. Below is an example:
 
@@ -195,31 +197,47 @@ import json
 import base64
 from PIL import Image
 from io import BytesIO
+import matplotlib.pyplot as plt
 
-# Define the URL and payload
+# Define the URL and payload for image generation
 url = "http://localhost:8888/generate"
 payload = {
     "prompt": "A futuristic cityscape with flying cars",
     "width": 512,
     "height": 512,
     "steps": 50,
-    "cfg": 7.5
+    "cfg": 4.0
 }
 
-# Send the request
-response = requests.post(url, json=payload)
+# Set headers for the request
+headers = {
+    "Content-Type": "application/json"
+}
 
-# Handle the response
+# Make the POST request
+response = requests.post(url, data=json.dumps(payload), headers=headers)
+
+# Check if the request was successful
 if response.status_code == 200:
-    data = response.json()
-    image_base64 = data['image']
-    image_data = base64.b64decode(image_base64)
-    
-    # Display the image
-    image = Image.open(BytesIO(image_data))
-    image.show()
+    # Extract the base64-encoded image from the response
+    image_base64 = response.json().get("image")
+
+    if image_base64:
+        # Decode the base64 string into image bytes
+        image_data = base64.b64decode(image_base64)
+        
+        # Create an image object from the bytes
+        image = Image.open(BytesIO(image_data))
+        
+        # Display the image using matplotlib
+        plt.figure(figsize=(10, 10))  # Adjust figure size for better visibility
+        plt.imshow(image)
+        plt.axis('off')  # Hide axes
+        plt.show()
+    else:
+        print("No image found in the response.")
 else:
-    print(f"Failed to generate image: {response.status_code}")
+    print(f"Error: {response.status_code}, {response.text}")
 ```
 
 ---
