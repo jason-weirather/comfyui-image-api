@@ -62,7 +62,7 @@ RUN mkdir -p /home/mambauser/.config/comfy-cli && \
 
 ENV COMFYUI_IMAGE_API_DEFAULT_HOST 0.0.0.0
 
-ENV LOG_LEVEL DEBUG
+#ENV LOG_LEVEL DEBUG
 
 # Set up entrypoint for comfy-api, model-path is required
 ENTRYPOINT ["micromamba","run","-n","base","comfy-api"]
