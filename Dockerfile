@@ -5,7 +5,7 @@ ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 
 # Install Python 3.11 in the base environment globally for all users
-RUN micromamba install -n base python=3.11 git -c conda-forge && \
+RUN micromamba install -n base python=3.11 git nano -c conda-forge && \
     micromamba clean --all --yes
 
 # Install PyTorch with CUDA using micromamba run (so we don’t need to activate the base environment manually)
@@ -31,7 +31,7 @@ RUN micromamba run -n base git clone https://github.com/comfyanonymous/ComfyUI.g
     micromamba run -n base pip install -r /opt/ComfyUI/requirements.txt
 
 # Clone your fork of comfy-cli instead of installing from pip
-RUN micromamba run -n base git clone --branch fixhangbug https://github.com/jason-weirather/comfy-cli.git /opt/comfy-cli
+RUN micromamba run -n base git clone --branch updatetimeoutoption https://github.com/jason-weirather/comfy-cli.git /opt/comfy-cli
 
 # Install comfy-cli
 ENV COMFYUI_PATH=/opt/ComfyUI
@@ -61,6 +61,8 @@ RUN mkdir -p /home/mambauser/.config/comfy-cli && \
     chmod -R 777 /home/mambauser
 
 ENV COMFYUI_IMAGE_API_DEFAULT_HOST 0.0.0.0
+
+ENV LOG_LEVEL DEBUG
 
 # Set up entrypoint for comfy-api, model-path is required
 ENTRYPOINT ["micromamba","run","-n","base","comfy-api"]
