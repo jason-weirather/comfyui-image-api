@@ -8,6 +8,17 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 RUN micromamba install -n base python=3.11 git nano -c conda-forge && \
     micromamba clean --all --yes
 
+USER root
+
+# Add your _activate_current_env.sh to the global profile.d directory
+RUN cp /usr/local/bin/_activate_current_env.sh /etc/profile.d/activate_mamba.sh && \
+    chmod +x /etc/profile.d/activate_mamba.sh
+
+# Ensure it is sourced for all users by adding it to profile.d (global for bash users)
+RUN echo "source /etc/profile.d/activate_mamba.sh" >> /etc/bash.bashrc
+
+USER mambauser
+
 # Install PyTorch with CUDA using micromamba run (so we don’t need to activate the base environment manually)
 RUN micromamba run -n base pip install \
     torch \
@@ -64,8 +75,8 @@ ENV COMFYUI_IMAGE_API_DEFAULT_HOST 0.0.0.0
 
 #ENV LOG_LEVEL DEBUG
 
-# Set up entrypoint for comfy-api, model-path is required
-ENTRYPOINT ["micromamba","run","-n","base","comfy-api"]
+# Use the wrapper script as the entrypoint
+ENTRYPOINT ["/opt/comfyui-image-api/start.sh"]
 
 # Command to start comfy-api
-CMD ["comfy-api", "--port","8888","--host","$COMFYUI_IMAGE_API_HOST","--model-path","/opt/ComfyUI/models/diffusers"]
+CMD ["--port", "8888", "--host", "$COMFYUI_IMAGE_API_DEFAULT_HOST", "--model-path", "/opt/ComfyUI/models/diffusers"]
